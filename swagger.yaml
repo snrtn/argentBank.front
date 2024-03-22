@@ -1,0 +1,174 @@
+swagger: '2.0'
+info:
+  title: Bank Argent API Documentation
+  description: API endpoints for user authentication, profile management, and transactions.
+  version: '1.0.0'
+  termsOfService: 'http://swagger.io/terms/'
+host: localhost:3001
+basePath: /api/v1
+schemes:
+  - http
+paths:
+  /user/login:
+    post:
+      tags:
+        - User Module
+      summary: User Login
+      description: User login with email and password.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Login'
+      responses:
+        '200':
+          description: Login successful.
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        '400':
+          description: Invalid request data.
+        '500':
+          description: Server error.
+  /user/profile:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Fetch User Profile
+      description: Fetches the user's profile data.
+      responses:
+        '200':
+          description: Profile data fetched successfully.
+          schema:
+            $ref: '#/definitions/UserProfileResponse'
+        '401':
+          description: Unauthorized. Token missing or invalid.
+        '500':
+          description: Server error.
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Update User Profile
+      description: Updates user profile data.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UserProfile'
+      responses:
+        '200':
+          description: Profile updated successfully.
+          schema:
+            $ref: '#/definitions/UserProfileResponse'
+        '400':
+          description: Invalid request data.
+        '401':
+          description: Unauthorized. Token missing or invalid.
+        '500':
+          description: Server error.
+  /transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Transactions Module
+      summary: Fetch Transactions
+      description: Fetches a list of all transactions for the logged-in user.
+      responses:
+        '200':
+          description: Transactions fetched successfully.
+          schema:
+            $ref: '#/definitions/TransactionsListResponse'
+        '401':
+          description: Unauthorized. Token missing or invalid.
+        '500':
+          description: Server error.
+  /transactions/{transactionId}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Transactions Module
+      summary: Fetch Transaction Details
+      description: Fetches details of a specific transaction.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Transaction details fetched successfully.
+          schema:
+            $ref: '#/definitions/TransactionDetailsResponse'
+        '401':
+          description: Unauthorized. Token missing or invalid.
+        '404':
+          description: Transaction not found.
+        '500':
+          description: Server error.
+definitions:
+  Login:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+  LoginResponse:
+    type: object
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/UserProfile'
+  UserProfile:
+    type: object
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+  UserProfileResponse:
+    type: object
+    properties:
+      user:
+        $ref: '#/definitions/UserProfile'
+  TransactionsListResponse:
+    type: object
+    properties:
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/TransactionDetails'
+  TransactionDetails:
+    type: object
+    properties:
+      id:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      amount:
+        type: number
+      balance:
+        type: number
+  TransactionDetailsResponse:
+    type: object
+    properties:
+      transaction:
+        $ref: '#/definitions/TransactionDetails'
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    in: header
+    name: Authorization
